@@ -1,0 +1,168 @@
+<html>
+<head>
+    <title>Body of text</title>
+    <link rel="stylesheet" href="https://use.typekit.net/txg5rqd.css">
+    <link href="style.css" type="text/css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js" integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+    <script type="module"   src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.js" integrity="sha512-h2yAJGs6A3USkcONreY8oUWx3hpn0+Etx/+M2kvVXSI/CeH8XBwQZCT5gtOe9PQ1wocd55b0ZPg0sf1/5fUsGw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module">
+
+        import m from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.js";
+
+        $(document).ready(function() {
+            $(".drillable").on('mouseover', (event) => {
+                event.stopPropagation();
+                let drillable = $(event.target).closest(".drillable");
+                let $parents = $(drillable).parents(".drillable.hover");
+                if ($parents.length > 0) {
+                    $parents.trigger("mouseleave");
+                }
+
+                $(drillable).addClass('hover');
+                $(drillable).one('mouseleave', mouseleaveCallback);
+            })
+            let mouseleaveCallback = (event) => {
+                event.stopPropagation();
+                $(event.target).removeClass('hover');
+            };
+
+            var isInsideAPopover = false;
+
+            var $theDrillDown;
+
+            let $drilldown = $(".drilldown");
+            $drilldown.on("mouseover", function(event) {
+                let html = document.querySelector("#popover").innerHTML;
+                $theDrillDown = $(this);
+                $theDrillDown.popover({
+                    html: true,
+                    content: html,
+                    animation: true
+                })
+                $theDrillDown.popover("show");
+                $(".popover").one("mouseleave", function() {
+                    $theDrillDown.popover('hide');
+                })
+            });
+
+            $drilldown.click(event => {
+                $(".body-of-text").hide();
+                //get the target
+                let target = $(event.target).get(0).getAttribute("data-target");
+                let path = $(event.target).get(0).getAttribute("data-path");
+                let element = document.querySelector(`#${target}`);
+                path = path.split("/");
+                drillDown(target, path)
+                //get the path
+                //
+                $theDrillDown.popover("hide");
+            })
+
+            function drillDown(target, path, leadingContent) {
+                $(".body-of-text").hide();
+                var breadcrumb = document.querySelector(".bread-crumb-template").innerHTML;
+                let data = {
+                    breadcrumbs: path.map(step => {
+                        return {
+                            href: '#',
+                            text: step
+                        }
+                    })
+                };
+                let html = m.render(breadcrumb, data);
+                $(".bread-crumb").html(html);
+                $(target).show();
+
+            }
+        });
+
+
+    </script>
+</head>
+<body>
+<div class="bread-crumb-template">
+    <ul>
+        {{#breadcrumbs}}
+        <li><a href="{{href}}" class="item">{{text}}</a></li>
+        {{/breadcrumbs}}
+    </ul>
+</div>
+
+
+<div id="host">
+    <div class="bread-crumb">
+    </div>
+
+    <div class="body-of-text">
+        <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus iaculis lorem nec elit bibendum, sed viverra est pharetra.
+            Maecenas vehicula vestibulum ante ultrices pharetra. Nam aliquet ante ut risus dapibus pulvinar. Aliquam sit amet libero velit. Mauris aliquam nisi non mattis sodales. Donec sit amet feugiat ipsum. Mauris nec convallis arcu. Praesent semper, magna id faucibus lobortis, erat orci porta purus, quis placerat nisi tellus vitae sapien. Duis ornare justo et est feugiat, dapibus pharetra augue condimentum. Maecenas pretium hendrerit sapien ac venenatis. Cras in orci dui.
+        </p>
+
+        <p>
+        Nullam hendrerit placerat semper. Maecenas tincidunt efficitur felis id ornare. Cras mollis, lacus eget finibus vestibulum,
+            sem leo luctus magna, non dictum sem ante et neque. Class aptent taciti sociosqu ad litora torquent per conubia nostra,
+            per inceptos himenaeos. Vivamus sagittis, urna ac vulputate vehicula, libero quam finibus leo, non ultricies lorem erat
+            rhoncus lorem. <span class="drillable drillable-847474"><span class="drilldown"></span>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin vestibulum
+            libero sit amet lorem iaculis ullamcorper. <span class="drillable"><span class="drilldown" data-path="top/#1" data-target="drilled-1"></span>Proin in turpis pulvinar, vehicula lacus quis, sodales ante.</span></span>
+        </p>
+
+        <p>Phasellus eros nulla, imperdiet nec iaculis et, rhoncus vitae lectus. In hac habitasse platea dictumst. Duis
+            id mi sodales, accumsan orci vitae, aliquet mi. Cras fringilla metus vitae nibh cursus, sit amet vulputate magna
+            iaculis. Ut a ligula ornare, tincidunt augue a, fringilla dolor. Nunc ligula dui, interdum sed mattis eget, fermentum
+            quis libero. Aenean sagittis, quam in molestie pulvinar, tortor magna volutpat nulla, ut rutrum mauris erat accumsan
+            diam. Fusce non tellus malesuada, rutrum est a, ullamcorper nulla. Maecenas non purus ac purus convallis ornare. Suspendisse
+            ac tempus libero.</p>
+
+        Nulla ultrices ex a nisi venenatis bibendum. Suspendisse finibus cursus ipsum, in suscipit arcu vulputate ac. Fusce at
+        scelerisque ipsum, non dignissim eros. Morbi feugiat scelerisque interdum. Aenean tempus euismod nunc, id dignissim orci
+        efficitur id. Aliquam egestas viverra lacus, non tristique ante euismod nec. Aenean sed eleifend libero. Praesent non metus
+        vel eros ullamcorper efficitur. Integer maximus dictum diam ac accumsan. Nunc iaculis non massa eget fermentum. Integer et
+        convallis enim. Aliquam sed lectus tempus, rutrum dui a, interdum mauris.
+
+        Nulla lorem felis, dictum ultricies dolor et, porta congue elit. Integer lobortis ante et eleifend imperdiet. Ut euismod
+        dolor quis hendrerit suscipit. In sit amet pulvinar erat. Phasellus maximus enim eu enim vestibulum laoreet. Aenean
+        egestas augue vel ornare imperdiet. Sed ac nisl leo.
+    </div>
+    <div class="drilled drilled-1">
+        <div class="excerpt">Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin vestibulum
+            libero sit amet lorem iaculis ullamcorper. </div>
+        Nulla ultrices ex a nisi venenatis bibendum. Suspendisse finibus cursus ipsum, in suscipit arcu vulputate ac. Fusce at
+        scelerisque ipsum, non dignissim eros. Morbi feugiat scelerisque interdum. Aenean tempus euismod nunc, id dignissim orci
+        efficitur id. Aliquam egestas viverra lacus, non tristique ante euismod nec. Aenean sed eleifend libero. Praesent non metus
+        vel eros ullamcorper efficitur. Integer maximus dictum diam ac accumsan. Nunc iaculis non massa eget fermentum. Integer et
+        convallis enim. Aliquam sed lectus tempus, rutrum dui a, interdum mauris.
+    </div>
+
+    <div class="drilled drilled-where">
+        <h2>Where?</h2>
+    </div>
+    <div class="drilled drilled-why">
+        <h2>Why</h2>
+    </div>
+    <div class="drilled drilled-sources">
+        <h2>Sources</h2>
+        Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin vestibulum
+        libero sit amet lorem iaculis ullamcorper. </div>
+    Nulla ultrices ex a nisi venenatis bibendum. Suspendisse finibus cursus ipsum, in suscipit arcu vulputate ac. Fusce at
+    scelerisque ipsum, non dignissim eros. Morbi feugiat scelerisque interdum. Aenean tempus euismod nunc, id dignissim orci
+    efficitur id. Aliquam egestas viverra lacus, non tristique ante euismod nec. Aenean sed eleifend libero. Praesent non metus
+    vel eros ullamcorper efficitur. Integer maximus dictum diam ac accumsan. Nunc iaculis non massa eget fermentum. Integer et
+    convallis enim. Aliquam sed lectus tempus, rutrum dui a, interdum mauris.</div>
+
+</div>
+
+<div id="popover">
+    <ul class="popover-content">
+        <li><a href="#" data-target="drilled-why">Why?</a></li>
+        <li><a href="#" data-target="drilled-where">Where?</li>
+        <li><a href="#" data-target="drilled-sources">Sources</li>
+    </ul>
+</div>
+
+
+</body>
+</html>

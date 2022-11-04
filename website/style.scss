@@ -1,0 +1,35 @@
+html, body {
+  margin: 0 auto;
+  background: #efefef;
+  font-family: basic-sans, sans-serif;
+}
+.main {
+  width: 1250px;
+  margin: 0 auto;
+}
+
+.body {
+  display: flex;
+  nav {
+    flex-grow: 0;
+  }
+  main {
+    flex-grow: 1;
+  }
+}
+
+nav {
+  width: 300px;
+  ul {
+    padding-left: 15px;
+    li {
+    }
+  }
+}
+header {
+  h1 {
+    font-size: 80px;
+    text-align: center;
+  }
+}
+
